@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 Nintendo Switch K3s Monitor</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(22, 27, 34, 0.8);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            border: 1px solid #30363d;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #21262d;
+        }
+        .header h1 {
+            font-size: 2.5em;
+            color: #e60012;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+        .subtitle {
+            color: #58a6ff;
+            font-size: 1.2em;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .card {
+            background: #21262d;
+            border-radius: 10px;
+            padding: 20px;
+            border-left: 4px solid #0066cc;
+            transition: transform 0.2s ease;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .card-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #58a6ff;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .metric-value {
+            font-size: 2em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .status-good { color: #3fb950; }
+        .status-warning { color: #f85149; }
+        .status-info { color: #58a6ff; }
+        .links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .link {
+            background: linear-gradient(45deg, #238636, #2ea043);
+            color: white;
+            padding: 12px 20px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(35, 134, 54, 0.3);
+        }
+        .link:hover {
+            background: linear-gradient(45deg, #2ea043, #3fb950);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(35, 134, 54, 0.4);
+        }
+        .loading {
+            text-align: center;
+            color: #58a6ff;
+            font-style: italic;
+        }
+        .error {
+            color: #f85149;
+            background: rgba(248, 81, 73, 0.1);
+            padding: 10px;
+            border-radius: 5px;
+            border-left: 3px solid #f85149;
+        }
+        .refresh-info {
+            text-align: center;
+            color: #8b949e;
+            margin-top: 20px;
+            font-size: 0.9em;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #30363d;
+            border-radius: 4px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3fb950, #58a6ff);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        @media (max-width: 768px) {
+            .grid { grid-template-columns: 1fr; }
+            .links { flex-direction: column; }
+            .header h1 { font-size: 2em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎮 Nintendo Switch K3s Monitor</h1>
+            <div class="subtitle">Real-time System & Kubernetes Performance</div>
+        </div>
+        
+        <div class="links">
+            <a href="http://192.168.0.112:30910/metrics" class="link" target="_blank">📊 Raw Metrics</a>
+            <a href="http://192.168.0.112:30900" class="link" target="_blank">🔍 Prometheus</a>
+            <a href="https://192.168.0.112:30000" class="link" target="_blank">⚙️ Kubernetes Dashboard</a>
+            <a href="javascript:location.reload()" class="link">🔄 Refresh Now</a>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <div class="card-title">🖥️ System Performance</div>
+                <div id="system-metrics" class="loading">Loading system metrics...</div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">⚓ Kubernetes Status</div>
+                <div id="k8s-status" class="loading">Loading cluster status...</div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">📊 Resource Usage</div>
+                <div id="resource-usage" class="loading">Loading resource data...</div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">🔋 Switch Status</div>
+                <div class="metric-value status-good">✅ Online</div>
+                <div>ARM64 Architecture</div>
+                <div>Mobile Kubernetes Cluster</div>
+                <div>IP: 192.168.0.112</div>
+            </div>
+        </div>
+
+        <div class="refresh-info">
+            🔄 Auto-refreshing every 10 seconds | Last updated: <span id="last-update">--</span>
+        </div>
+    </div>
+
+    <script>
+        let refreshInterval;
+        
+        async function fetchMetrics() {
+            try {
+                const [systemResponse, k8sResponse] = await Promise.all([
+                    fetch('/api/metrics'),
+                    fetch('/api/k8s')
+                ]);
+                
+                const systemData = await systemResponse.json();
+                const k8sData = await k8sResponse.json();
+                
+                updateSystemMetrics(systemData);
+                updateK8sStatus(k8sData);
+                updateResourceUsage(systemData, k8sData);
+                
+                document.getElementById('last-update').textContent = new Date().toLocaleTimeString();
+            } catch (error) {
+                console.error('Error fetching metrics:', error);
+                showError('Failed to fetch metrics. Check if the monitoring service is running.');
+            }
+        }
+        
+        function updateSystemMetrics(data) {
+            const container = document.getElementById('system-metrics');
+            if (data.error) {
+                container.innerHTML = `<div class="error">Error: ${data.error}</div>`;
+                return;
+            }
+            
+            container.innerHTML = `
+                <div><strong>Memory:</strong> ${data.memory.used}% used (${data.memory.available}GB available)</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: ${data.memory.used}%"></div>
+                </div>
+                <div><strong>Load Average:</strong> ${data.loadAverage.join(', ')}</div>
+                <div><strong>Uptime:</strong> ${data.uptime}</div>
+            `;
+        }
+        
+        function updateK8sStatus(data) {
+            const container = document.getElementById('k8s-status');
+            if (data.error) {
+                container.innerHTML = `<div class="error">Error: ${data.error}</div>`;
+                return;
+            }
+            
+            const readyPods = data.pods.filter(p => p.ready).length;
+            const totalPods = data.pods.length;
+            
+            container.innerHTML = `
+                <div><strong>Nodes:</strong> ${data.nodes.length} ${data.nodes[0]?.status || 'Unknown'}</div>
+                <div><strong>Pods:</strong> ${readyPods}/${totalPods} Ready</div>
+                <div><strong>Version:</strong> ${data.nodes[0]?.version || 'Unknown'}</div>
+                <div><strong>OS:</strong> ${data.nodes[0]?.os || 'Unknown'}</div>
+            `;
+        }
+        
+        function updateResourceUsage(systemData, k8sData) {
+            const container = document.getElementById('resource-usage');
+            
+            const cpuLoadPercent = systemData.loadAverage ? Math.min(systemData.loadAverage[0] * 25, 100) : 0;
+            
+            container.innerHTML = `
+                <div><strong>CPU Load:</strong> ${cpuLoadPercent.toFixed(1)}%</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: ${cpuLoadPercent}%"></div>
+                </div>
+                <div><strong>Memory:</strong> ${systemData.memory?.used || 0}%</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: ${systemData.memory?.used || 0}%"></div>
+                </div>
+                <div><strong>Running Pods:</strong> ${k8sData.pods?.filter(p => p.status === 'Running').length || 0}</div>
+            `;
+        }
+        
+        function showError(message) {
+            const containers = ['system-metrics', 'k8s-status', 'resource-usage'];
+            containers.forEach(id => {
+                const container = document.getElementById(id);
+                if (container.classList.contains('loading')) {
+                    container.innerHTML = `<div class="error">${message}</div>`;
+                }
+            });
+        }
+        
+        // Initial load
+        fetchMetrics();
+        
+        // Auto-refresh every 10 seconds
+        refreshInterval = setInterval(fetchMetrics, 10000);
+        
+        // Refresh when tab becomes visible
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                fetchMetrics();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: nintendo-hello-task
+  namespace: default
+spec:
+  params:
+  - name: greeting
+    type: string
+    description: "Greeting message"
+    default: "Hello from Nintendo Switch!"
+  steps:
+  - name: hello
+    image: alpine:latest
+    script: |
+      #!/bin/sh
+      echo "🎮 $(params.greeting)"
+      echo "Running on ARM64 Nintendo Switch Kubernetes!"
+      echo "Architecture: $(uname -m)"
+      echo "Kernel: $(uname -r)"
+      echo "Hostname: $(hostname)"
+      echo "Date: $(date)"
+      echo "✅ Nintendo Switch CI/CD Pipeline Complete!"
+---
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: nintendo-switch-pipeline
+  namespace: default
+spec:
+  params:
+  - name: greeting
+    type: string
+    description: "Greeting message for the Nintendo Switch"
+    default: "Hello from portable Kubernetes!"
+  tasks:
+  - name: greet-nintendo
+    taskRef:
+      name: nintendo-hello-task
+    params:
+    - name: greeting
+      value: $(params.greeting)
+  - name: system-info
+    runAfter: ["greet-nintendo"]
+    taskSpec:
+      steps:
+      - name: system-check
+        image: alpine:latest
+        script: |
+          #!/bin/sh
+          echo "🎮 Nintendo Switch System Information:"
+          echo "=================================="
+          echo "CPU Architecture: $(uname -m)"
+          echo "Kernel Version: $(uname -r)"
+          echo "OS Info: $(cat /etc/os-release | grep PRETTY_NAME)"
+          echo "Available Memory:"
+          cat /proc/meminfo | grep MemTotal
+          echo "CPU Info:"
+          cat /proc/cpuinfo | grep "model name" | head -1
+          echo "=================================="
+          echo "🚀 ARM64 Pipeline completed successfully on Nintendo Switch!"
+---
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: nintendo-switch-run-$(date +%s)
+  namespace: default
+  generateName: nintendo-run-
+spec:
+  pipelineRef:
+    name: nintendo-switch-pipeline
+  params:
+  - name: greeting
+    value: "🎮 Greetings from your mobile Kubernetes cluster!"

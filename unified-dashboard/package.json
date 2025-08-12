@@ -1,0 +1,14 @@
+{
+  "name": "nintendo-switch-dashboard",
+  "version": "1.0.0",
+  "description": "Elegant unified dashboard for Nintendo Switch K3s cluster",
+  "main": "api.js",
+  "scripts": {
+    "start": "node api.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "author": "Nintendo Switch K3s",
+  "license": "MIT"
+}

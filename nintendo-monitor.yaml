@@ -1,0 +1,115 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nintendo-monitor
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nintendo-monitor
+  template:
+    metadata:
+      labels:
+        app: nintendo-monitor
+    spec:
+      containers:
+      - name: monitor
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: monitor-content
+          mountPath: /usr/share/nginx/html
+      volumes:
+      - name: monitor-content
+        configMap:
+          name: monitor-content
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: monitor-content
+  namespace: monitoring
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Nintendo Switch System Monitor</title>
+        <meta http-equiv="refresh" content="30">
+        <style>
+            body { font-family: Arial, sans-serif; margin: 20px; background: #0d1117; color: #fff; }
+            .container { background: #161b22; padding: 20px; border-radius: 10px; border: 1px solid #30363d; }
+            h1 { color: #e60012; text-align: center; }
+            .metric { margin: 15px 0; padding: 15px; background: #21262d; border-radius: 5px; border-left: 4px solid #0066cc; }
+            .metric-title { font-weight: bold; font-size: 18px; color: #58a6ff; }
+            .metric-value { font-size: 24px; margin: 10px 0; }
+            .status-good { color: #3fb950; }
+            .links { display: flex; gap: 10px; margin: 20px 0; flex-wrap: wrap; }
+            .link { background: #238636; padding: 10px 15px; text-decoration: none; color: white; border-radius: 5px; }
+            .link:hover { background: #2ea043; }
+            .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>🎮 Nintendo Switch Kubernetes Monitor</h1>
+            <div class="links">
+                <a href="http://192.168.0.112:30910/metrics" class="link" target="_blank">📊 System Metrics</a>
+                <a href="http://192.168.0.112:30900" class="link" target="_blank">🔍 Prometheus</a>
+                <a href="https://192.168.0.112:30000" class="link" target="_blank">⚙️ K8s Dashboard</a>
+                <a href="javascript:location.reload()" class="link">🔄 Refresh</a>
+            </div>
+            <div class="grid">
+                <div class="metric">
+                    <div class="metric-title">🎮 System Status</div>
+                    <div class="metric-value status-good">✅ Online & Running</div>
+                    <div>ARM64 Nintendo Switch</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-title">⚓ Kubernetes</div>
+                    <div class="metric-value status-good">✅ Single-Node Cluster</div>
+                    <div>K3s v1.33.3+k3s1</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-title">📡 Network Access</div>
+                    <div class="metric-value">192.168.0.112</div>
+                    <div>🌐 No VPN Required - Direct Access</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-title">🔋 Mobile Ready</div>
+                    <div class="metric-value status-good">✅ Battery Powered</div>
+                    <div>Portable Kubernetes!</div>
+                </div>
+            </div>
+            <div class="metric">
+                <div class="metric-title">📈 Quick Access Commands</div>
+                <pre style="background: #0d1117; padding: 15px; border-radius: 5px; overflow-x: auto; font-size: 14px;">
+# Connect from your Mac:
+export KUBECONFIG=~/.kube/nintendo-switch-config
+kubectl get nodes
+kubectl top nodes
+kubectl get pods --all-namespaces
+
+# SSH to Nintendo Switch:
+ssh waveywaves@192.168.0.112
+kubectl get nodes</pre>
+            </div>
+        </div>
+    </body>
+    </html>
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nintendo-monitor
+  namespace: monitoring
+spec:
+  selector:
+    app: nintendo-monitor
+  ports:
+  - port: 80
+    targetPort: 80
+    nodePort: 30800
+  type: NodePort

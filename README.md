@@ -1,55 +1,71 @@
-# 🎮⚓ K3s Nintendo Switch Cluster
+# 🎮⚓ Nintendo Switch Kubernetes Cluster
 
-**A complete setup for running Kubernetes on your Nintendo Switch with Tekton CI/CD pipelines!**
+**Turn your Nintendo Switch into a complete, standalone Kubernetes cluster!**
 
-This repository provides everything you need to set up a K3s Kubernetes cluster with:
-- **macOS Master Node**: Running K3s server in Docker
-- **Nintendo Switch Worker Node**: ARM64 device running K3s agent
-- **Tekton Pipelines**: CI/CD pipelines optimized for ARM64 builds
+This setup creates a **single-node K3s cluster** running entirely on your Nintendo Switch with:
+- **Complete Independence**: No dependency on other machines
+- **Web Dashboard**: Kubernetes Dashboard for cluster management
+- **ARM64 Optimized**: All components built for Nintendo Switch hardware
+- **Mobile Kubernetes**: Battery-powered cluster you can take anywhere!
+- **Clean & Simple**: Minimal setup focused on core Kubernetes functionality
 
 ## 🚀 Quick Start
 
 ### One-Command Setup
 ```bash
-./setup-k3s-nintendo-cluster.sh
+./setup-nintendo-standalone-k3s.sh
 ```
 
-The script will interactively prompt you for your Nintendo Switch credentials and then automatically:
-1. ✅ Check dependencies and install missing tools
-2. ✅ Set up K3s master on your macOS 
-3. ✅ Install K3s agent on Nintendo Switch
-4. ✅ Install Tekton Pipelines with Dashboard
-5. ✅ Create sample pipelines for testing
-6. ✅ Configure the Nintendo Switch as a dedicated worker node
+This will create a complete, independent Kubernetes cluster on your Nintendo Switch with:
+1. ✅ Single-node K3s cluster (master + worker combined)
+2. ✅ Kubernetes Dashboard with web UI
+3. ✅ Web-based cluster management interface
+4. ✅ Sample workloads and demo applications
+5. ✅ Clean, minimal setup focused on core functionality
+
+**Access your cluster**: `http://[nintendo-switch-ip]:30080`
 
 ### Custom Configuration
 ```bash
 # Specify IP address, script will prompt for credentials
-./setup-k3s-nintendo-cluster.sh --switch-ip 192.168.1.100
+./setup-nintendo-standalone-k3s.sh --switch-ip 192.168.1.100
 
 # Set credentials via environment variables (non-interactive)
-SWITCH_USER=myuser SWITCH_PASS=mypassword ./setup-k3s-nintendo-cluster.sh
+SWITCH_USER=myuser SWITCH_PASS=mypassword ./setup-nintendo-standalone-k3s.sh
 
 # Custom K3s version
-./setup-k3s-nintendo-cluster.sh --k3s-version v1.29.0+k3s1
+./setup-nintendo-standalone-k3s.sh --k3s-version v1.29.0+k3s1
 
 # Show all options
-./setup-k3s-nintendo-cluster.sh --help
+./setup-nintendo-standalone-k3s.sh --help
 ```
+
+## 📊 Nintendo Switch Cluster Features
+
+### 🎯 Web Dashboard Access
+- **Cluster Overview**: `http://[switch-ip]:30080` - Main information dashboard
+- **Kubernetes Dashboard**: `http://[switch-ip]:30000` - Full cluster management
+
+### 🚀 Core Capabilities
+- **Single-node Cluster**: Complete Kubernetes functionality in one device
+- **Web Management**: Browser-based cluster administration
+- **ARM64 Native**: Optimized for Nintendo Switch ARM64 architecture
+- **Portable**: Take your Kubernetes cluster anywhere
+
+### 🔧 Independent Operation
+- **No External Dependencies**: Complete cluster runs on Nintendo Switch only
+- **Battery Powered**: Can run on Nintendo Switch battery for mobile Kubernetes!
+- **Clean & Simple**: Focused on core Kubernetes functionality without extras
+- **Easy Management**: Simple web interface for all cluster operations
 
 ## 📋 Prerequisites
 
-### macOS Master
-- macOS (Intel or Apple Silicon)
-- Docker Desktop installed and running
-- kubectl installed
-- Homebrew (for dependency installation)
-
-### Nintendo Switch
 - Nintendo Switch with Linux installed (Ubuntu 18.04+ recommended)
 - SSH access enabled
 - sudo privileges for the user
-- Network connectivity to macOS
+- Network connectivity (for downloading components)
+- At least 4GB storage free
+- Computer with kubectl installed (for initial setup)
 
 ## 🎯 What You Get
 
@@ -203,12 +219,11 @@ kubectl describe pipelinerun <pipeline-run-name>
 
 ```
 k8s-nintendo-switch/
-├── setup-k3s-nintendo-cluster.sh    # 🎯 Main setup script (ONE COMMAND!)
-├── tekton-nintendo-pipeline.yaml    # 🏗️ Sample Tekton pipelines for ARM64
-└── README.md                        # 📚 Complete documentation
+├── setup-nintendo-standalone-k3s.sh    # 🎯 Nintendo Switch standalone cluster setup
+└── README.md                           # 📚 Complete documentation
 ```
 
-**That's it! Just 3 files for a complete Nintendo Switch Kubernetes cluster with CI/CD pipelines!**
+**Just 2 files for a complete Nintendo Switch Kubernetes cluster!**
 
 ## 🛠️ Troubleshooting
 

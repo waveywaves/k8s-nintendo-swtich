@@ -1,0 +1,17 @@
+{
+  "name": "nintendo-switch-monitor",
+  "version": "1.0.0",
+  "description": "Lightweight monitoring dashboard for Nintendo Switch K3s cluster",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "axios": "^1.6.0",
+    "ws": "^8.14.2"
+  },
+  "author": "Nintendo Switch K3s",
+  "license": "MIT"
+}
